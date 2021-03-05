@@ -10,52 +10,54 @@ var
 packet_counter = {};
 
 
-var draw_packet_key = function(max_x, max_y) {
+var draw_packet_key = function (max_x, max_y) {
   var start_y = 10;
   var segments = Object.keys(PACKET_TYPES).length,
-      segment_width = (max_y - start_y) / segments;
+    segment_width = (max_y - start_y) / segments;
 
 
   var index = 0,
-      packet_radius = 4;
-  $.each(PACKET_TYPES, function(i, p) {
+    packet_radius = 4;
+
+  $.each(PACKET_TYPES, function (i, p) {
     index += 1;
     var y = start_y + (index * (segment_width + packet_radius)),
-        x = 2 * packet_radius + NODE_RADIUS;
+      x = 2 * packet_radius + NODE_RADIUS;
     var packet = PAPER.circle(x, y, packet_radius);
-    var text = PAPER.text(x, y - (2*packet_radius), i);
+    var text = PAPER.text(x, y - (2 * packet_radius) - 5, i);
 
     packet.attr("fill", new p().fill);
   });
 };
 
 
-var timeline = function() {
+var timeline = function () {
 }
 
-timeline.init = function(min, max) {
+timeline.init = function (min, max) {
   this.start = min;
   this.end = max;
 }
 
-timeline.draw = function(packets, end_x, end_y, segments) {
+timeline.draw = function (packets, end_x, end_y, segments) {
 
   end_y += 75;
   end_x += 50;
   start_x = 50;
   var width = end_x - start_x;
   var segment_width = 5,
-      segment_distance = (width - (segments * segment_width)) / segments,
-      segment_delay = packets[packets.length-1].delay / segments;
+    segment_distance = (width - (segments * segment_width)) / segments,
+    segment_delay = packets[packets.length - 1].delay / segments;
 
   var start_delay,
-      end_delay;
+    end_delay;
 
   PAPER.setStart();
   var j = 0;
   for (var i = 0; i < segments; i++) {
     var count = 0;
     for (; packets[j].delay < segment_delay * i; j += 1) {
+      packets[j].fired = false;
       count += 1;
     }
 
@@ -69,30 +71,31 @@ timeline.draw = function(packets, end_x, end_y, segments) {
   var st = PAPER.setFinish();
   mover.animate({
     x: end_x,
-    }, (this.end - this.start) * 1000 * PLAY_SPEED, function() {
-      STOP_ANIMATION = true;
-      $("#canvas").fadeOut(function() {
-        $('body').attr("background-color", "#000");
-        $('#controls').fadeIn();
-      });
+  }, (this.end - this.start) * 1000 * PLAY_SPEED, function () {
+    STOP_ANIMATION = true;
+    PAPER = null;
+    // $("#canvas").fadeOut(function () {
+    //     $('body').attr("background-color", "#000");
+    //     $('#controls').fadeIn();
+    // });
 
-    });
+  });
 }
 
-var DataPacket = function() {
+var DataPacket = function () {
   this.fill = "#1689cf";
   return this;
 };
 
-DataPacket.prototype.init = function(packet) {
+DataPacket.prototype.init = function (packet) {
   this.packet = packet;
   var size = Math.log(packet.bytes / 2 || 10);
   this.packetEl = PAPER.circle(packet.sendr.x, packet.sendr.y, size);
-  this.packetEl.cleanup = $.proxy(function() {
+  this.packetEl.cleanup = $.proxy(function () {
     var s = this.packet.sendr,
-        r = this.packet.recvr;
+      r = this.packet.recvr;
     for (var i in [s, r]) {
-      var n = [s,r][i];
+      var n = [s, r][i];
       packet_counter[n.name] -= 1;
       if (packet_counter[n.name] <= 0) {
         n.nodeEl.hide();
@@ -104,11 +107,11 @@ DataPacket.prototype.init = function(packet) {
   this.packetEl.hide();
 }
 
-DataPacket.prototype.animate = function() {
-  this.packetEl.attr("fill",  this.fill || "#1689cf");
+DataPacket.prototype.animate = function () {
+  this.packetEl.attr("fill", this.fill || "#1689cf");
   this.packetEl.attr("stroke", "none");
   this.packetEl.show();
-  var rand_num = function() {
+  var rand_num = function () {
     var n = parseInt(Math.random() * NODE_RADIUS / 2);
     if (Math.random() > 0.5) {
       n *= -1;
@@ -117,16 +120,16 @@ DataPacket.prototype.animate = function() {
   };
 
   var control_x = this.packet.sendr.x + rand_num(),
-      control_y = this.packet.sendr.y + rand_num();
+    control_y = this.packet.sendr.y + rand_num();
   this.packetEl.attr("cx", control_x);
   this.packetEl.attr("cy", control_y);
   this.packetEl.animate({
-      cx: this.packet.recvr.x + rand_num(),
-      cy: this.packet.recvr.y + rand_num()
-    },
+    cx: this.packet.recvr.x + rand_num(),
+    cy: this.packet.recvr.y + rand_num()
+  },
     this.packet.flight_time * 1000 * PLAY_SPEED,
     "<>",
-    $.proxy(function() { setTimeout(this.packetEl.cleanup, 500); }, this)
+    $.proxy(function () { setTimeout(this.packetEl.cleanup, 500); }, this)
   );
 }
 
@@ -165,13 +168,13 @@ $.extend(ReTransPacket.prototype, DataPacket.prototype);
 
 
 var PACKET_TYPES = {
-  "DATA"          : DataPacket,
-  "SYN"           : SynPacket,
-  "FIN"           : FinPacket,
-  "CTRL"          : CtrlPacket,
-  "UDP"           : UDPPacket,
-  "PUSH"          : PushPacket,
-  "RETRANS"       : ReTransPacket
+  "DATA": DataPacket,
+  "SYN": SynPacket,
+  "FIN": FinPacket,
+  "CTRL": CtrlPacket,
+  "UDP": UDPPacket,
+  "PUSH": PushPacket,
+  "RETRANS": ReTransPacket
 }
 
 for (var p in PACKET_TYPES) {
@@ -180,8 +183,8 @@ for (var p in PACKET_TYPES) {
 }
 
 var packets = [],
-    packetEls = [],
-    nodes = [];
+  packetEls = [],
+  nodes = [];
 
 nodes.put = nodes.push
 
@@ -191,9 +194,9 @@ function NetworkNode(name, x, y) {
   this.x = x;
   this.y = y;
 
-  var sendPacket = function(node, delay, bytes, type, t) {
+  var sendPacket = function (node, delay, bytes, type, t) {
     var packet = new Packet(this, node, delay, bytes, type, t),
-        packetEl = new packet.type();
+      packetEl = new packet.type();
     packets.push(packet);
     packet.packetEl = packetEl;
   };
@@ -212,23 +215,25 @@ function Packet(sendr, recvr, delay, bytes, type, flight_time) {
 
 function start_animation(paper, play_speed) {
   var node,
-      packet,
-      max_x = 0,
-      min_x = 10000,
-      max_y = 0,
-      min_y = 10000;
+    packet,
+    max_x = 0,
+    min_x = 10000,
+    max_y = 0,
+    min_y = 10000;
 
-  PAPER=paper;
-  PLAY_SPEED=play_speed || 1;
+  STOP_ANIMATION = false;
+  PAPER = paper;
+  PLAY_SPEED = play_speed || 1;
+  packet_counter = {};
 
   start_time = new Date();
-  packets.sort(function(a, b) {
+  packets.sort(function (a, b) {
     if (a.delay > b.delay) { return 1 }
     if (a.delay < b.delay) { return -1 }
     return 0;
   });
 
-  for (var p  = 0; p < packets.length; p++) {
+  for (var p = 0; p < packets.length; p++) {
     var packet = packets[p];
     packet.packetEl.init(packet);
   }
@@ -242,7 +247,7 @@ function start_animation(paper, play_speed) {
 
     nodeEl.push(node_circ);
     nodeEl.push(PAPER.text(node.x, node.y - NODE_RADIUS - 10, node.name));
-    nodeEl.push(node_circ.glow( { width: 3 }));
+    nodeEl.push(node_circ.glow({ width: 3 }));
     node.nodeEl = nodeEl;
 
     node_circ.hide();
@@ -290,13 +295,13 @@ function show_flight(PAPER, max_x, max_y) {
       packet.fired = true;
       packetEl = packet.packetEl;
       var s = packet.sendr,
-          r = packet.recvr;
+        r = packet.recvr;
 
       if (!packet_counter[s.name]) { packet_counter[s.name] = 0 };
       if (!packet_counter[r.name]) { packet_counter[r.name] = 0 };
 
-      for (var i in [s,r]) {
-        var n = [s,r][i];
+      for (var i in [s, r]) {
+        var n = [s, r][i];
         packet_counter[n.name] += 1;
         n.nodeEl.stop().show();
         n.nodeEl.attr('fill-opacity', 1);
@@ -313,4 +318,3 @@ function show_flight(PAPER, max_x, max_y) {
 
   replay();
 };
-
