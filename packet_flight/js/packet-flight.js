@@ -7,9 +7,6 @@ var
   PLAY_SPEED = 2,
   STOP_ANIMATION;
 
-packet_counter = {};
-
-
 var draw_packet_key = function (max_x, max_y) {
   var start_y = 10;
   var segments = Object.keys(PACKET_TYPES).length,
@@ -211,6 +208,15 @@ function Packet(sendr, recvr, delay, bytes, type, flight_time) {
   this.bytes = bytes;
   this.flight_time = flight_time;
   this.type = type;
+}
+
+function blankTheCanvas(paper) {
+  paper.setStart();
+  paper.circle(16, 16, 15).attr({ fill: 'white' }).data('bound', true);
+  paper.circle(16, 16, 10);
+  paper.path('M16,6L16,9M21,7L19.5,10M25,11L22,12.5M26,16L23,16M25,21L22,19.5M21,25L19.5,22M16,26L16,23M11,25L12.5,22M7,21L10,19.5M6,16L9,16M7,11L10,12.5M11,7L12.5,10M18,9L16,16L20,16');
+  paper.text(205, 16, 'Select Speed and then click on Visualize Packets to start animation...').attr({ 'font-size': 11 }).data('id', 'text_name');
+  return paper.setFinish();
 }
 
 function start_animation(paper, play_speed) {

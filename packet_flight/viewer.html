@@ -67,22 +67,31 @@
       background-color: #f1f1f1;
     }
   </style>
-
+</head>
+<body>
   <script>
 
-    $(function () {
+      function visualize(slider) {
+        var paper = Raphael("canvas", "100%", "100%");
+        start_animation(paper, parseInt(slider.value));
+      };
+
+      $(function () {
       var slider = document.getElementById("myslider");
       var output = document.getElementById("demo");
       var btnStart = document.getElementById("start");
       init_data();
       btnStart.onclick = function () {
-        var paper = Raphael("canvas", "100%", "100%");
-        start_animation(paper, parseInt(slider.value));
+        visualize(slider);
       }
       output.innerHTML = slider.value;
       slider.oninput = function () {
         output.innerHTML = this.value;
       }
+      blankTheCanvas(Raphael("canvas", "100%", "100%"));
+      // we could start the visualization immediately
+      // maybe this should be parameterized
+      //visualize(slider);
     });
 
   </script>
@@ -93,8 +102,8 @@
 
   <div id="slider">
     <p>&nbsp;&nbsp;SPEED:
-      <input type="range" min="1" max="20" value="2" id="myslider" style="vertical-align: middle">
-      Value: <span id="demo"></span>
+      <input type="range" min="1" max="20" value="1" id="myslider" style="vertical-align: middle">
+      Value: <b><span id="demo"></span></b>
       <button class="button" id="start">Visualize Packets</button>
   </div>
 
