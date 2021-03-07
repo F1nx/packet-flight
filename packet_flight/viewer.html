@@ -1,18 +1,26 @@
-<html lang="en"><head>
-<meta charset="utf-8">
-<title>Packet Flight</title>
+<html lang="en">
 
-<script src="js/jquery.min.js"></script>
-<script src="js/raphael-min.js"></script>
-<script src="js/packet-flight.js"></script>
-<script src="js/data.js"></script>
+<head>
+  <meta charset="utf-8">
+  <title>Packet Flight</title>
 
-<style media="screen">
-    html, body {
+  <script src="js/jquery.min.js"></script>
+  <script src="js/raphael-min.js"></script>
+  <script src="js/packet-flight.js"></script>
+  <script src="js/data.js"></script>
+
+  <style media="screen">
+    html,
+    body {
+      font-style: normal;
+      font-weight: 400;
+      font-size: 11px;
+      font-family: system-ui;
+      font-variant-caps: normal;
       height: 100%;
       padding: 0;
       overflow: hidden;
-      background-color: #000;
+      background-color: #a880be;
     }
 
     #canvas {
@@ -20,39 +28,59 @@
       background-color: #efefef;
     }
 
-    #controls {
-      width: 100%;
+    #slider {
+      margin: auto;
+      background-color: #efefef;
+    }
+
+    .button {
+      background-color: #ddd;
+      border: none;
+      color: black;
+      padding: 10px 20px;
       text-align: center;
-      font-size: 20px;
-      margin-top: auto;
-      height: 100%;
-      position: absolute;
-      top: 50%;
-      color: #efefef;
-      z-index: 1;
+      text-decoration: none;
+      display: inline-block;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 8px;
     }
 
-    #replay {
-      position: relative;
-      top: -50%;
+    .button:hover {
+      background-color: #f1f1f1;
     }
-</style>
+  </style>
+</head>
+<body>
+  <script>
 
-<script>
+      $(function () {
+      var slider = document.getElementById("myslider");
+      var output = document.getElementById("demo");
+      var btnStart = document.getElementById("start");
+      init_data();
+      btnStart.onclick = function () {
+        start_animation(Raphael("canvas", "100%", "100%"), parseInt(slider.value));
+      }
+      output.innerHTML = slider.value;
+      slider.oninput = function () {
+        output.innerHTML = this.value;
+      }
+      blankTheCanvas(Raphael("canvas", "100%", "100%"));
+    });
 
-$(function() {
-  var paper = Raphael("canvas", "100%", "100%");
-  init_data();
-  start_animation(paper, 1);
-});
+  </script>
 
-</script>
+  <div id="slider">
+    <p>&nbsp;&nbsp;SPEED:
+      <input type="range" min="1" max="10" value="10" id="myslider" style="vertical-align: middle">
+      Value: <b><span id="demo"></span></b>
+      <button class="button" id="start">Visualize Packets</button>
+  </div>
 
-<div id="controls" style="display: none;">
-  Fin
-</div>
+  <div id="canvas">
+  </div>
 
-<div id="canvas"> </div>
+  </body>
 
-</body>
 </html>
