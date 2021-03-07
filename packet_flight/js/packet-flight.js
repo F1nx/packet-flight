@@ -1,17 +1,11 @@
-// Packet Flight Viewer.
-
-var
-  FRAME_SIZE = 1000,
-  NODE_RADIUS = 20,
-  PAPER = null,
-  PLAY_SPEED = 2,
-  STOP_ANIMATION;
+var FRAME_SIZE = 1000,
+    NODE_RADIUS = 20,
+    timeline = {};
 
 var draw_packet_key = function (max_x, max_y) {
   var start_y = 10;
   var segments = Object.keys(PACKET_TYPES).length,
     segment_width = (max_y - start_y) / segments;
-
 
   var index = 0,
     packet_radius = 4;
@@ -27,10 +21,6 @@ var draw_packet_key = function (max_x, max_y) {
   });
 };
 
-
-var timeline = function () {
-}
-
 timeline.init = function (min, max) {
   this.start = min;
   this.end = max;
@@ -41,9 +31,8 @@ timeline.draw = function (packets, end_x, end_y, segments) {
   end_y += 75;
   end_x += 50;
   start_x = 50;
-  var width = end_x - start_x;
   var segment_width = 5,
-    segment_distance = (width - (segments * segment_width)) / segments,
+    segment_distance = ((end_x - start_x) - (segments * segment_width)) / segments,
     segment_delay = packets[packets.length - 1].delay / segments;
 
   var start_delay,
@@ -71,11 +60,6 @@ timeline.draw = function (packets, end_x, end_y, segments) {
   }, (this.end - this.start) * 1000 * PLAY_SPEED, function () {
     STOP_ANIMATION = true;
     PAPER = null;
-    // $("#canvas").fadeOut(function () {
-    //     $('body').attr("background-color", "#000");
-    //     $('#controls').fadeIn();
-    // });
-
   });
 }
 
@@ -214,6 +198,7 @@ function blankTheCanvas(paper) {
   paper.setStart();
   paper.circle(16, 16, 15).attr({ fill: 'white' }).data('bound', true);
   paper.circle(16, 16, 10);
+  // paper.path = Clock Icon
   paper.path('M16,6L16,9M21,7L19.5,10M25,11L22,12.5M26,16L23,16M25,21L22,19.5M21,25L19.5,22M16,26L16,23M11,25L12.5,22M7,21L10,19.5M6,16L9,16M7,11L10,12.5M11,7L12.5,10M18,9L16,16L20,16');
   paper.text(205, 16, 'Select Speed and then click on Visualize Packets to start animation...').attr({ 'font-size': 11 }).data('id', 'text_name');
   return paper.setFinish();
@@ -229,7 +214,8 @@ function start_animation(paper, play_speed) {
 
   STOP_ANIMATION = false;
   PAPER = paper;
-  PLAY_SPEED = play_speed || 1;
+  PLAY_SPEED = Math.abs(play_speed - 10) || 1;
+  // 1 = Max Speed. 10 = Range Max. Math.abs() for flipping the value to correct
   packet_counter = {};
 
   start_time = new Date();

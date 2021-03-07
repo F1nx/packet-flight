@@ -33,23 +33,6 @@
       background-color: #efefef;
     }
 
-    #controls {
-      width: 100%;
-      text-align: center;
-      font-size: 20px;
-      margin-top: auto;
-      height: 100%;
-      position: absolute;
-      top: 50%;
-      color: #efefef;
-      z-index: 1;
-    }
-
-    #replay {
-      position: relative;
-      top: -50%;
-    }
-
     .button {
       background-color: #ddd;
       border: none;
@@ -71,38 +54,26 @@
 <body>
   <script>
 
-      function visualize(slider) {
-        var paper = Raphael("canvas", "100%", "100%");
-        start_animation(paper, parseInt(slider.value));
-      };
-
       $(function () {
       var slider = document.getElementById("myslider");
       var output = document.getElementById("demo");
       var btnStart = document.getElementById("start");
       init_data();
       btnStart.onclick = function () {
-        visualize(slider);
+        start_animation(Raphael("canvas", "100%", "100%"), parseInt(slider.value));
       }
       output.innerHTML = slider.value;
       slider.oninput = function () {
         output.innerHTML = this.value;
       }
       blankTheCanvas(Raphael("canvas", "100%", "100%"));
-      // we could start the visualization immediately
-      // maybe this should be parameterized
-      //visualize(slider);
     });
 
   </script>
 
-  <div id="controls" style="display: none;">
-    Thats all folks
-  </div>
-
   <div id="slider">
     <p>&nbsp;&nbsp;SPEED:
-      <input type="range" min="1" max="20" value="1" id="myslider" style="vertical-align: middle">
+      <input type="range" min="1" max="10" value="10" id="myslider" style="vertical-align: middle">
       Value: <b><span id="demo"></span></b>
       <button class="button" id="start">Visualize Packets</button>
   </div>
