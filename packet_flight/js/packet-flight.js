@@ -21,7 +21,6 @@ var draw_packet_key = function (max_x, max_y) {
   });
 };
 
-
 timeline.init = function (min, max) {
   this.start = min;
   this.end = max;
