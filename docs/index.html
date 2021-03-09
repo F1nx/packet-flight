@@ -1,0 +1,50 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Packet Flight</title>
+<script src="js/lib/jquery.js"></script>
+<script src="js/lib/raphael.js"></script>
+<script src="js/packet-flight.js"></script>
+<script>
+  var i = parseInt(sessionStorage.getItem('paTimer'))
+  var scrpt = document.createElement("SCRIPT")
+  scrpt.type = 'text/javascript'
+  if (i >= 1) {
+    scrpt.src = 'data' + i + '.js'
+    localStorage.setItem('paTimer', (i + 1))
+  } else {
+    scrpt.src = 'data1.js'
+    sessionStorage.setItem('paTimer', '1')
+  }
+  document.getElementsByTagName('head')[0].appendChild(scrpt);
+</script>
+<style media="screen">
+    html, body {
+      height: 100%;
+      padding: 0;
+      overflow: hidden;
+      background-color: #000;
+    }
+
+    #canvas {
+      margin: auto;
+      background-color: #efefef;
+    }
+
+    #replay {
+      position: relative;
+      top: -50%;
+    }
+</style>
+</head>
+<body>
+<script>
+$(function() {
+  var paper = Raphael("canvas", "100%", "100%");
+  init_data();
+  start_animation(paper, 1);
+});
+</script>
+<div id="canvas"> </div>
+</body>
+</html>
